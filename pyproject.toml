@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "image-ocr-extractor"
+version = "0.1.0"
+description = "Extract text from images with an OpenCV preprocessing pipeline and Tesseract OCR — as a library, CLI and web API."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Mykhaylo Zhyhan" }]
+keywords = ["ocr", "tesseract", "opencv", "fastapi", "computer-vision", "image-processing"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+]
+dependencies = [
+    "numpy>=1.24",
+    "opencv-python-headless>=4.8",
+    "Pillow>=10.0",
+    "pytesseract>=0.3.10",
+]
+
+[project.optional-dependencies]
+web = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9"]
+dev = [
+    "image-ocr-extractor[web]",
+    "httpx>=0.27",
+    "mypy>=1.10",
+    "pre-commit>=3.7",
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+ocr-extract = "ocr_extractor.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/mzhyhan/image-ocr-extractor"
+Issues = "https://github.com/mzhyhan/image-ocr-extractor/issues"
+
+[tool.setuptools.packages.find]
+include = ["ocr_extractor*"]
+
+[tool.setuptools.package-data]
+"ocr_extractor.web" = ["static/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF", "D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D100", "D103", "D104"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_unreachable = true
+pretty = true
+files = ["ocr_extractor", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["pytesseract", "pytesseract.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "ocr_extractor"]
+addopts = "-ra --doctest-modules"
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
+
+[tool.coverage.run]
+source = ["ocr_extractor"]
+branch = true
+omit = ["ocr_extractor/__main__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 95
+exclude_also = ["if __name__ == .__main__.:", "if TYPE_CHECKING:"]
